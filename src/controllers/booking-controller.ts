@@ -3,6 +3,7 @@ import httpStatus from "http-status";
 import { AuthenticatedRequest } from "../middlewares";
 import bookingService from "../services/booking-service";
 import { notFoundError } from "../errors";
+import { InputBookingBody } from "../protocols";
 
 async function getBooking(req: AuthenticatedRequest, res: Response){
     const userId = req.userId;
@@ -19,7 +20,7 @@ async function getBooking(req: AuthenticatedRequest, res: Response){
 }
 
 async function createBooking(req: AuthenticatedRequest, res: Response){
-    const { roomId } = req.body;
+    const { roomId } = req.body as InputBookingBody;
     const userId = req.userId;
 
     if(!roomId){
@@ -27,7 +28,7 @@ async function createBooking(req: AuthenticatedRequest, res: Response){
     }
     
     try{
-        const booking = await bookingService.createBooking(userId, Number(roomId));
+        const booking = await bookingService.createBooking(userId, roomId);
         return res.status(httpStatus.OK).send(booking);
 
     } catch(err){
@@ -41,16 +42,16 @@ async function createBooking(req: AuthenticatedRequest, res: Response){
 }
 
 async function updateBooking(req: AuthenticatedRequest, res: Response){
-    const {roomId} = req.body;
+    const {roomId} = req.body as InputBookingBody;
     const userId = req.userId;
     const id = req.params;
 
     if(!roomId){
         throw notFoundError();
     }
-    
+
     try{
-        const newBooking = await bookingService.updateBooking(Number(id), userId, Number(roomId));
+        const newBooking = await bookingService.updateBooking(Number(id), userId, roomId);
         return res.status(httpStatus.OK).send(newBooking);
     } catch(err){
         if(err.name === 'NotFoundError'){
