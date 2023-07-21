@@ -19,7 +19,7 @@ async function getBooking(req: AuthenticatedRequest, res: Response){
 }
 
 async function createBooking(req: AuthenticatedRequest, res: Response){
-    const roomId = req.body;
+    const { roomId } = req.body;
     const userId = req.userId;
 
     if(!roomId){
@@ -41,9 +41,14 @@ async function createBooking(req: AuthenticatedRequest, res: Response){
 }
 
 async function updateBooking(req: AuthenticatedRequest, res: Response){
-    const roomId = req.body;
+    const {roomId} = req.body;
     const userId = req.userId;
     const id = req.params;
+
+    if(!roomId){
+        throw notFoundError();
+    }
+    
     try{
         const newBooking = await bookingService.updateBooking(Number(id), userId, Number(roomId));
         return res.status(httpStatus.OK).send(newBooking);

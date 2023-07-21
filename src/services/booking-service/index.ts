@@ -12,25 +12,23 @@ async function getBooking(userId: number){
 }
 
 async function createBooking(userId: number,roomId: number){
-    // const checkRoom = await bookingRepository.checkRoomCapacity(roomId);
 
     const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
     const existsTicket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
-    if(!existsTicket || existsTicket.status === 'RESERVED' || existsTicket.TicketType.isRemote || !existsTicket.TicketType.includesHotel){
+    const checkRoom = await bookingRepository.checkRoomCapacityLength(roomId);
+    const checkCapacity = await bookingRepository.checkRoomCapacity(roomId);
+
+    if(!existsTicket || existsTicket.status === 'RESERVED' || existsTicket.TicketType.isRemote || !existsTicket.TicketType.includesHotel || checkRoom.length > checkCapacity.total){
         throw forbiddenError();
     }
 
-    // const checkCreateBooking = await bookingRepository.findUserToCreateBooking(userId);
-    // if(!checkCreateBooking){
-    //     throw forbiddenError();
-    // }
 
     const booking = await bookingRepository.createBooking(userId, roomId);
     return booking;
 }
 
 async function updateBooking(id: number, userId: number, roomId: number){
-    const checkRoom = await bookingRepository.checkRoomCapacity(roomId);
+    const checkRoom = await bookingRepository.checkRoomCapacityLength(roomId);
     const checkBooking = await bookingRepository.getBooking(userId);
     if(!checkBooking || checkRoom.length > checkBooking.Room.capacity){
         throw forbiddenError();

@@ -1,9 +1,9 @@
 import { prisma } from "@/config";
 
-async function getBooking(id: number){
+async function getBooking(userId: number){
     const booking = await prisma.booking.findFirst({
         where: {
-            userId: id
+            userId: userId
         },
         include: {
             Room: true,
@@ -22,25 +22,6 @@ async function getBooking(id: number){
         }
     }
 
-}
-
-async function findUserToCreateBooking(userId: number){
-    return await prisma.ticket.findFirst({
-        where: {
-            status: 'PAID',
-            Enrollment: {
-                userId: userId
-            },
-            TicketType: {
-                isRemote: false,
-                includesHotel: true
-            }
-        },
-        include:{
-            Enrollment: true,
-            TicketType: true
-        }
-    })
 }
 
 async function createBooking(userId: number, roomId: number){
@@ -72,7 +53,7 @@ async function updateBooking(id: number, userId: number, roomId: number){
 
 }
 
-async function checkRoomCapacity(roomId: number){
+async function checkRoomCapacityLength(roomId: number){
     return await prisma.room.findMany({
         where: {
             id: roomId
@@ -80,12 +61,24 @@ async function checkRoomCapacity(roomId: number){
     });
 }
 
+async function checkRoomCapacity(roomId: number){
+    const room = await prisma.room.findFirst({
+        where: {
+            id: roomId
+        }
+    });
+
+    return {
+        total: room.capacity
+    }
+}
+
 const bookingRepository = {
     getBooking,
     createBooking,
     updateBooking,
-    findUserToCreateBooking,
-    checkRoomCapacity
+    checkRoomCapacity,
+    checkRoomCapacityLength
 }
 
 export default bookingRepository;
