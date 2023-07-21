@@ -55,3 +55,11 @@ async function updateBooking(req: AuthenticatedRequest, res: Response){
         return res.sendStatus(httpStatus.INTERNAL_SERVER_ERROR)
     }
 }
+
+const bookingController = {
+    getBooking,
+    createBooking,
+    updateBooking
+}
+
+export default bookingController;

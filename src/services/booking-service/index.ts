@@ -10,16 +10,24 @@ async function getBooking(userId: number){
 }
 
 async function createBooking(userId: number,roomId: number){
+    const checkRoom = await bookingRepository.checkRoomCapacity(roomId);
+
     const checkCreateBooking = await bookingRepository.findUserToCreateBooking(userId);
     if(!checkCreateBooking){
         throw forbiddenError();
     }
-    
+
     const booking = await bookingRepository.createBooking(userId, roomId);
     return booking;
 }
 
 async function updateBooking(id: number, userId: number, roomId: number){
+    const checkRoom = await bookingRepository.checkRoomCapacity(roomId);
+    const checkBooking = await bookingRepository.getBooking(userId);
+    if(!checkBooking || checkRoom.length > checkBooking.Room.capacity){
+        throw forbiddenError();
+    }
+
     const booking = await bookingRepository.updateBooking(id, userId, roomId);
     return booking;
 }

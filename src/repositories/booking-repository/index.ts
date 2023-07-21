@@ -65,15 +65,27 @@ async function updateBooking(id: number, userId: number, roomId: number){
             userId: userId,
             roomId: roomId,
         }
-    })
+    });
+    return {
+        bookingId: booking.id
+    }
 
+}
+
+async function checkRoomCapacity(roomId: number){
+    return await prisma.room.findMany({
+        where: {
+            id: roomId
+        }
+    });
 }
 
 const bookingRepository = {
     getBooking,
     createBooking,
     updateBooking,
-    findUserToCreateBooking
+    findUserToCreateBooking,
+    checkRoomCapacity
 }
 
 export default bookingRepository;
