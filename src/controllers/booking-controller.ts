@@ -19,7 +19,7 @@ async function getBooking(req: AuthenticatedRequest, res: Response){
 }
 
 async function createBooking(req: AuthenticatedRequest, res: Response){
-    const roomId = parseInt(req.body);
+    const roomId = req.body;
     const userId = req.userId;
 
     if(!roomId){
@@ -27,7 +27,7 @@ async function createBooking(req: AuthenticatedRequest, res: Response){
     }
     
     try{
-        const booking = await bookingService.createBooking(userId, roomId);
+        const booking = await bookingService.createBooking(userId, Number(roomId));
         return res.status(httpStatus.OK).send(booking);
 
     } catch(err){
@@ -41,11 +41,11 @@ async function createBooking(req: AuthenticatedRequest, res: Response){
 }
 
 async function updateBooking(req: AuthenticatedRequest, res: Response){
-    const roomId = parseInt(req.body);
+    const roomId = req.body;
     const userId = req.userId;
     const id = req.params;
     try{
-        const newBooking = await bookingService.updateBooking(Number(id), userId, roomId);
+        const newBooking = await bookingService.updateBooking(Number(id), userId, Number(roomId));
         return res.status(httpStatus.OK).send(newBooking);
     } catch(err){
         if(err.name === 'NotFoundError'){
