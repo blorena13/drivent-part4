@@ -54,9 +54,9 @@ async function updateBooking(id: number, userId: number, roomId: number){
 }
 
 async function checkRoomCapacityLength(roomId: number){
-    return await prisma.room.findMany({
+    return await prisma.booking.findMany({
         where: {
-            id: roomId
+            roomId: roomId
         }
     });
 }

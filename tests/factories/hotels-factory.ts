@@ -19,3 +19,6 @@ export async function createRoomWithHotelId(hotelId: number) {
     },
   });
 }
+
+
+
