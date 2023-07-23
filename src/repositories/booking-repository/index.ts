@@ -1,7 +1,7 @@
 import { prisma } from "@/config";
 
 async function getBooking(userId: number){
-    const booking = await prisma.booking.findFirst({
+    return await prisma.booking.findFirst({
         where: {
             userId: userId
         },
@@ -9,32 +9,15 @@ async function getBooking(userId: number){
             Room: true,
         }
     });
-
-    return {
-        id: booking.id,
-        Room: { 
-            id: booking.Room.id,
-            name: booking.Room.name,
-            capacity: booking.Room.capacity,
-            hotelId: booking.Room.hotelId,
-            createdAt: booking.Room.createdAt.toISOString(),
-            updatedAt: booking.Room.updatedAt.toISOString()
-        }
-    }
-
 }
 
 async function createBooking(userId: number, roomId: number){
-    const booking = await prisma.booking.create({
+    return await prisma.booking.create({
         data: {
             userId: userId,
             roomId: roomId,
         }
     });
-
-    return {
-        bookingId: booking.id
-    }
 }
 
 async function updateBooking(id: number, userId: number, roomId: number){
