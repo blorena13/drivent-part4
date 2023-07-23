@@ -61,24 +61,22 @@ async function checkRoomCapacityLength(roomId: number){
     });
 }
 
-async function checkRoomCapacity(roomId: number){
-    const room = await prisma.room.findFirst({
+
+
+async function checkExistsRoom(roomId: number){
+    return prisma.room.findFirst({
         where: {
             id: roomId
         }
     });
-
-    return {
-        total: room.capacity
-    }
 }
 
 const bookingRepository = {
     getBooking,
     createBooking,
     updateBooking,
-    checkRoomCapacity,
-    checkRoomCapacityLength
+    checkRoomCapacityLength,
+    checkExistsRoom
 }
 
 export default bookingRepository;
