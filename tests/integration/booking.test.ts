@@ -66,8 +66,8 @@ describe('GET /booking', () => {
                 name: createdRoom.name,
                 capacity: createdRoom.capacity,
                 hotelId: createdRoom.hotelId,
-                createdAt: createdRoom.createdAt.toISOString(),
-                updatedAt: createdRoom.updatedAt.toISOString()
+                createdAt: createdRoom.createdAt,
+                updatedAt: createdRoom.updatedAt
              } 
             });
         });

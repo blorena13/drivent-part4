@@ -15,8 +15,8 @@ async function getBooking(userId: number){
             name: booking.Room.name,
             capacity: booking.Room.capacity,
             hotelId: booking.Room.hotelId,
-            createdAt: booking.Room.createdAt.toISOString(),
-            updatedAt: booking.Room.updatedAt.toISOString()
+            createdAt: booking.Room.createdAt,
+            updatedAt: booking.Room.updatedAt
     }
 }
 }
@@ -33,7 +33,7 @@ async function createBooking(userId: number,roomId: number){
 
     const checkRoom = await bookingRepository.checkRoomCapacityLength(roomId);
     const checkBooking = await bookingRepository.getBooking(userId);
-    if(!checkBooking || checkRoom.length > checkBooking.Room.capacity){
+    if(checkRoom.length > checkBooking.Room.capacity){
         throw forbiddenError();
     }
 

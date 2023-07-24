@@ -2,6 +2,11 @@ import { Booking, Room } from "@prisma/client";
 import bookingRepository from "../../src/repositories/booking-repository";
 import bookingService from "../../src/services/booking-service";
 import { notFoundError } from "../../src/errors";
+import userRepository from "../../src/repositories/user-repository";
+import enrollmentRepository from "../../src/repositories/enrollment-repository";
+import { createEnrollmentWithAddress, createTicketTypeRemote, createUser, unitTicket } from "../factories";
+import ticketsRepository from "../../src/repositories/tickets-repository";
+import { createTicket } from "../../src/controllers";
 
 describe("Booking service unit tests",() => {
     beforeEach(() => {
@@ -17,8 +22,8 @@ describe("Booking service unit tests",() => {
                     name: 'Ana',
                     capacity: 3,
                     hotelId: 2,
-                    createdAt: String(new Date()),
-                    updatedAt: String(new Date())
+                    createdAt: new Date,
+                    updatedAt: new Date
                 }
             }
             jest.spyOn(bookingRepository, "getBooking").mockResolvedValueOnce(mockBooking);
@@ -34,19 +39,58 @@ describe("Booking service unit tests",() => {
     });
 
     describe("Post booking unit test", () => {
-        it("should return an error when roomId does not exist", async () => {
-            jest.spyOn(bookingRepository, "createBooking").mockResolvedValueOnce(null);
+        it("should return forbidden error when ticket is remote", async () => {
+            
+            jest.spyOn(enrollmentRepository, "findWithAddressByUserId").mockResolvedValue(createEnrollmentWithAddress(await createUser()));
+            jest.spyOn(ticketsRepository, "findTicketByEnrollmentId").mockResolvedValue(unitTicket(false, true, false));
+            const response = bookingService.createBooking(3, 2);
+            await expect(response).rejects.toEqual({
+                name: "ForbiddenError",
+                message: "Ticket is remote"
+            });
+        });
 
+        it("should return forbidden error when ticket does not includes hotel", async () => {
+            jest.spyOn(enrollmentRepository, "findWithAddressByUserId").mockResolvedValue(createEnrollmentWithAddress(await createUser()));
+            jest.spyOn(ticketsRepository, "findTicketByEnrollmentId").mockResolvedValue(unitTicket(false, false, true));
+            const response = bookingService.createBooking(3, 2);
+            await expect(response).rejects.toEqual({
+                name: "ForbiddenError",
+                message: "Ticket does not includes hotel"
+            });
+        });
+
+        it("should return forbidden error when ticket is unpaid", async () => {
+            jest.spyOn(enrollmentRepository, "findWithAddressByUserId").mockResolvedValue(createEnrollmentWithAddress(await createUser()));
+            jest.spyOn(ticketsRepository, "findTicketByEnrollmentId").mockResolvedValue(unitTicket(true, false, false));
+            const response = bookingService.createBooking(3, 2);
+            await expect(response).rejects.toEqual({
+                name: "ForbiddenError",
+                message: "Ticket unpaid"
+            });
 
         });
 
-        it("", async () => {
+        it("should return forbidden error when room is full", async () => {
+            jest.spyOn(userRepository, "create").mockResolvedValue(createUser())
+            jest.spyOn(enrollmentRepository, "findWithAddressByUserId").mockResolvedValue(createEnrollmentWithAddress(await createUser()));
+            jest.spyOn(ticketsRepository, "findTicketByEnrollmentId").mockResolvedValue(unitTicket(true, false, true));
+            const mockBooking: any = {
+                id: 1,
+                userId: 3,
+                roomId: 3
+            }
+            jest.spyOn(bookingRepository, "createBooking").mockResolvedValue(mockBooking);
+            jest.spyOn(bookingRepository, "createBooking").mockResolvedValue(mockBooking);
+            jest.spyOn(bookingRepository, "createBooking").mockResolvedValue(mockBooking);
 
-        });
+            const response = bookingService.createBooking(3, 2);
+            await expect(response).rejects.toEqual({
+                name: "ForbiddenError",
+                message: "room do not have capacity"
+            })
 
-        it("", async () => {
-
-        });
+        })
 
     })
 })
