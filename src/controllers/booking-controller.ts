@@ -20,8 +20,8 @@ async function getBooking(req: AuthenticatedRequest, res: Response){
 }
 
 async function createBooking(req: AuthenticatedRequest, res: Response){
-    const { roomId } = req.body as InputBookingBody;
     const userId = req.userId;
+    const { roomId } = req.body as InputBookingBody;
 
     if(!roomId){
         throw notFoundError();
@@ -44,7 +44,7 @@ async function createBooking(req: AuthenticatedRequest, res: Response){
 async function updateBooking(req: AuthenticatedRequest, res: Response){
     const {roomId} = req.body as InputBookingBody;
     const userId = req.userId;
-    const id = req.params;
+    const id = req.params.bookingId;
 
     if(!roomId){
         throw notFoundError();

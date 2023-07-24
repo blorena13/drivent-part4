@@ -12,12 +12,16 @@ async function getBooking(userId: number){
 }
 
 async function createBooking(userId: number, roomId: number){
-    return await prisma.booking.create({
+    const booking = await prisma.booking.create({
         data: {
             userId: userId,
             roomId: roomId,
         }
     });
+
+    return {
+        bookingId: booking.id
+    }
 }
 
 async function updateBooking(id: number, userId: number, roomId: number){
