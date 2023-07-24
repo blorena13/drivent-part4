@@ -96,13 +96,14 @@ describe('POST /booking', () => {
             const ticketType = await createTicketTypeRemote();
             const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
             const payment = await createPayment(ticket.id, ticketType.price);
+            const createdHotel = await createHotel();
+            const createdRoom = await createRoomWithHotelId(createdHotel.id);
 
-            const fakeBody = faker.seed.length;
 
             const response = await server
             .post('/booking')
             .set('Authorization', `Bearer ${token}`)
-            .send({roomId: fakeBody});
+            .send({roomId: createdRoom.id});
             expect(response.status).toBe(httpStatus.FORBIDDEN);
         })
 
@@ -113,13 +114,14 @@ describe('POST /booking', () => {
             const ticketType = await ticketWithoutHotel();
             const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
             await createPayment(ticket.id, ticketType.price);
+            const createdHotel = await createHotel();
+            const createdRoom = await createRoomWithHotelId(createdHotel.id);
 
-            const fakeBody = faker.seed.length;
 
             const response = await server
             .post('/booking')
             .set('Authorization', `Bearer ${token}`)
-            .send({roomId: fakeBody});
+            .send({roomId: createdRoom.id});
             expect(response.status).toBe(httpStatus.FORBIDDEN);
         })
 
