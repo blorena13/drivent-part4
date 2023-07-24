@@ -201,14 +201,17 @@ describe('POST /booking', () => {
 describe('UPDATE /booking/:bookingId', () => {
 
     it('should respond with status 401 if no token is given', async () => {
-        const response = await server.get('/booking');
+        const response = await server
+        .post('/booking')
         expect(response.status).toBe(httpStatus.UNAUTHORIZED);
     });
     
     it('should respond with status 401 if given token is not valid', async () => {
         const token = faker.lorem.word();
     
-        const response = await server.get('/booking').set('Authorization', `Bearer ${token}`);
+        const response = await server
+        .post('/booking')
+        .set('Authorization', `Bearer ${token}`)
         expect(response.status).toBe(httpStatus.UNAUTHORIZED);
     });
 
@@ -223,7 +226,10 @@ describe('UPDATE /booking/:bookingId', () => {
             const createdHotel = await createHotel();
             const createdRoom = await createRoomWithHotelId(createdHotel.id);
 
-            const response = await server.put(`/booking/`).set('Authorization', `Bearer ${token}`);
+            const response = await server
+            .put(`/booking/`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({roomId: createdRoom.id});
             expect(response.status).toBe(httpStatus.FORBIDDEN);
         
         })
@@ -244,7 +250,7 @@ describe('UPDATE /booking/:bookingId', () => {
              //pensar em um formato 
 
             const response = await server
-            .post(`/booking/${createdBooking3.id}`)
+            .put(`/booking/${createdBooking3.id}`)
             .set('Authorization', `Bearer ${token}`)
             .send({roomId: createdRoom.id});
             expect(response.status).toBe(httpStatus.FORBIDDEN);
@@ -260,7 +266,7 @@ describe('UPDATE /booking/:bookingId', () => {
             await createPayment(ticket.id, ticketType.price);
             const createdHotel = await createHotel();
 
-            const response = await server.post(`/booking`).set('Authorization', `Bearer ${token}`);
+            const response = await server.put(`/booking`).set('Authorization', `Bearer ${token}`);
             expect(response.status).toBe(httpStatus.NOT_FOUND);
         })
 
@@ -268,7 +274,7 @@ describe('UPDATE /booking/:bookingId', () => {
             const user = await createUser();
             const token = await generateValidToken(user);
             const enrollment = await createEnrollmentWithAddress(user);
-            const ticketType = await ticketWithoutHotel();
+            const ticketType = await createTicketTypeWithHotel();
             const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
             await createPayment(ticket.id, ticketType.price);
             const createdHotel = await createHotel();
@@ -277,9 +283,9 @@ describe('UPDATE /booking/:bookingId', () => {
             const createdBooking = await createBooking(enrollment.userId, createdRoom.id);
 
             const response = await server
-            .post(`/booking/${createdBooking.id}`)
+            .put(`/booking/${createdBooking.id}`)
             .set('Authorization', `Bearer ${token}`)
-            .send({roomId: createdRoom2});
+            .send({roomId: createdRoom2.id});
             expect(response.status).toBe(httpStatus.OK);
         });
     });

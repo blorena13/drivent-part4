@@ -33,7 +33,7 @@ async function createBooking(userId: number,roomId: number){
 
     const checkRoom = await bookingRepository.checkRoomCapacityLength(roomId);
     const checkBooking = await bookingRepository.getBooking(userId);
-    if(checkRoom.length > checkBooking.Room.capacity){
+    if(!checkBooking || checkRoom.length > checkBooking.Room.capacity){
         throw forbiddenError();
     }
 
@@ -47,7 +47,7 @@ async function createBooking(userId: number,roomId: number){
 async function updateBooking(id: number, userId: number, roomId: number){
     const checkRoom = await bookingRepository.checkRoomCapacityLength(roomId);
     const checkBooking = await bookingRepository.getBooking(userId);
-    if(!checkBooking || checkRoom.length > checkBooking.Room.capacity){
+    if(!id || !checkBooking || checkRoom.length > checkBooking.Room.capacity){
         throw forbiddenError();
     }
 
